@@ -6,7 +6,8 @@
 //
 
 import Foundation
-
+import SwiftData
+@Model
 class Friend { //declare class
     var name: String //property
     var birthday: Date //property
