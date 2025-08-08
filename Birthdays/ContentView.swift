@@ -8,7 +8,6 @@
 import SwiftUI
 import SwiftData
 
-@main
 struct Birthdays: App {
     var body: some Scene {
         WindowGroup {
@@ -18,7 +17,6 @@ struct Birthdays: App {
     }
 }
 
-
 struct ContentView: View {
     @State private var newName = ""
     @State private var newBirthday = Date.now
@@ -27,12 +25,16 @@ struct ContentView: View {
     
     var body: some View {
         NavigationStack {
-            List(friends) {friend in
-                HStack {
-                    Text(friend.name)
-                    Spacer()
-                    Text(friend.birthday, format: .dateTime.month(.wide).day().year())
-                } //end hstack
+            List {
+                ForEach(friends) {friend in HStack {
+                    HStack {
+                        Text(friend.name)
+                        Spacer()
+                        Text(friend.birthday, format: .dateTime.month(.wide).day().year())
+                    } //end row
+                }//end iterative row parameter
+                } //end iteration
+                .onDelete(perform: deleteFriend)
             } //end friend list
             
             .navigationTitle("Birthdays")
@@ -44,7 +46,7 @@ struct ContentView: View {
                     
                     DatePicker(selection: $newBirthday, in:Date.distantPast...Date.now, displayedComponents: .date) {
                         TextField("Name", text: $newName)
-                            .textFieldStyle(.roundedBorder)}
+                        .textFieldStyle(.roundedBorder)}
                     
                     Button("Save") {
                         let newFriend = Friend(name: newName, birthday: newBirthday)
@@ -53,7 +55,7 @@ struct ContentView: View {
                         newBirthday = Date.now
                     }
                     .bold()
-
+                    
                 }//end vstack
                 .padding()
                 .background(.bar)
@@ -62,11 +64,18 @@ struct ContentView: View {
         }//end navigationStack
         
         
-        
     } //end body
+    func deleteFriend(at offsets: IndexSet) {
+        for index in offsets {
+            let friendToDelete = friends[index]
+            context.delete(friendToDelete)
+        } //end closure
+    } //end function
+    
 } //end contentview
+    
+    #Preview {
+        ContentView()
+            .modelContainer(for: Friend.self, inMemory: true)
+    }
 
-#Preview {
-    ContentView()
-        .modelContainer(for: Friend.self, inMemory: true)
-}
